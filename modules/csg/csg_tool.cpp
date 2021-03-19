@@ -30,6 +30,8 @@
 
 #include "csg_tool.h"
 
+namespace csg_tool {
+
 // CSGPrimitive3D
 void CSGPrimitiveShape3D::_create_brush_from_arrays(const Vector<Vector3> &p_vertices, const Vector<Vector2> &p_uv, const Vector<bool> &p_smooth, const Vector<Ref<Material>> &p_materials) {
 	brush = CSGBrush();
@@ -1851,3 +1853,5 @@ AABB CSGTool::get_aabb() const {
 	}
 	return aabb;
 }
+
+} // namespace csg_tool

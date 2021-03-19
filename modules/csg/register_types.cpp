@@ -36,14 +36,14 @@
 void register_csg_types() {
 #ifndef _3D_DISABLED
 
-	ClassDB::register_virtual_class<CSGPrimitiveShape3D>();
-	ClassDB::register_class<CSGMeshShape3D>();
-	ClassDB::register_class<CSGBoxShape3D>();
-	ClassDB::register_class<CSGCylinderShape3D>();
-	ClassDB::register_class<CSGSphereShape3D>();
-	ClassDB::register_class<CSGTorusShape3D>();
-	ClassDB::register_class<CSGPolygonShape3D>();
-	ClassDB::register_class<CSGTool>();
+	ClassDB::register_virtual_class<csg_tool::CSGPrimitiveShape3D>();
+	ClassDB::register_class<csg_tool::CSGMeshShape3D>();
+	ClassDB::register_class<csg_tool::CSGBoxShape3D>();
+	ClassDB::register_class<csg_tool::CSGCylinderShape3D>();
+	ClassDB::register_class<csg_tool::CSGSphereShape3D>();
+	ClassDB::register_class<csg_tool::CSGTorusShape3D>();
+	ClassDB::register_class<csg_tool::CSGPolygonShape3D>();
+	ClassDB::register_class<csg_tool::CSGTool>();
 
 	ClassDB::register_virtual_class<CSGShape3D>();
 	ClassDB::register_virtual_class<CSGPrimitive3D>();

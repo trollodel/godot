@@ -40,6 +40,8 @@
 #include "scene/resources/mesh.h"
 #include "thirdparty/misc/mikktspace.h"
 
+namespace csg_tool {
+
 class CSGPrimitiveShape3D : public Resource {
 	GDCLASS(CSGPrimitiveShape3D, Resource);
 
@@ -258,9 +260,12 @@ public:
 	void set_path_joined(bool p_enable);
 	bool is_path_joined() const;
 };
+} // namespace csg_tool
 
-VARIANT_ENUM_CAST(CSGPolygonShape3D::Mode)
-VARIANT_ENUM_CAST(CSGPolygonShape3D::PathRotation)
+VARIANT_ENUM_CAST(csg_tool::CSGPolygonShape3D::Mode)
+VARIANT_ENUM_CAST(csg_tool::CSGPolygonShape3D::PathRotation)
+
+namespace csg_tool {
 
 class CSGTool : public Reference {
 	GDCLASS(CSGTool, Reference);
@@ -318,6 +323,8 @@ public:
 	AABB get_aabb() const;
 };
 
-VARIANT_ENUM_CAST(CSGTool::Operation)
+} // namespace csg_tool
+
+VARIANT_ENUM_CAST(csg_tool::CSGTool::Operation)
 
 #endif // CSG_TOOL_H

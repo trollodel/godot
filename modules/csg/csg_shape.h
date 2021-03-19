@@ -42,16 +42,16 @@ class CSGShape3D : public GeometryInstance3D {
 public:
 	// This is very ugly
 	enum Operation {
-		OPERATION_UNION = CSGTool::OPERATION_UNION,
-		OPERATION_INTERSECTION = CSGTool::OPERATION_INTERSECTION,
-		OPERATION_SUBTRACTION = CSGTool::OPERATION_SUBTRACTION,
+		OPERATION_UNION = csg_tool::CSGTool::OPERATION_UNION,
+		OPERATION_INTERSECTION = csg_tool::CSGTool::OPERATION_INTERSECTION,
+		OPERATION_SUBTRACTION = csg_tool::CSGTool::OPERATION_SUBTRACTION,
 	};
 
 private:
 	Operation operation = OPERATION_UNION;
 	CSGShape3D *parent = nullptr;
 
-	Ref<CSGTool> csg_tool;
+	Ref<csg_tool::CSGTool> csg_tool;
 
 	AABB node_aabb;
 
@@ -134,7 +134,7 @@ class CSGPrimitive3D : public CSGShape3D {
 
 protected:
 	virtual CSGBrush _build_brush() override;
-	virtual Ref<CSGPrimitiveShape3D> get_csg_primitive() const = 0;
+	virtual Ref<csg_tool::CSGPrimitiveShape3D> get_csg_primitive() const = 0;
 	static void _bind_methods();
 
 public:
@@ -153,11 +153,11 @@ public:
 class CSGMesh3D : public CSGPrimitive3D {
 	GDCLASS(CSGMesh3D, CSGPrimitive3D);
 
-	virtual Ref<CSGPrimitiveShape3D> get_csg_primitive() const override {
+	virtual Ref<csg_tool::CSGPrimitiveShape3D> get_csg_primitive() const override {
 		return csg_primitive;
 	}
 
-	Ref<CSGMeshShape3D> csg_primitive;
+	Ref<csg_tool::CSGMeshShape3D> csg_primitive;
 
 	void _mesh_changed();
 
@@ -174,11 +174,11 @@ public:
 class CSGSphere3D : public CSGPrimitive3D {
 	GDCLASS(CSGSphere3D, CSGPrimitive3D);
 
-	virtual Ref<CSGPrimitiveShape3D> get_csg_primitive() const override {
+	virtual Ref<csg_tool::CSGPrimitiveShape3D> get_csg_primitive() const override {
 		return csg_primitive;
 	}
 
-	Ref<CSGSphereShape3D> csg_primitive;
+	Ref<csg_tool::CSGSphereShape3D> csg_primitive;
 
 protected:
 	static void _bind_methods();
@@ -199,11 +199,11 @@ public:
 class CSGBox3D : public CSGPrimitive3D {
 	GDCLASS(CSGBox3D, CSGPrimitive3D);
 
-	virtual Ref<CSGPrimitiveShape3D> get_csg_primitive() const override {
+	virtual Ref<csg_tool::CSGPrimitiveShape3D> get_csg_primitive() const override {
 		return csg_primitive;
 	}
 
-	Ref<CSGBoxShape3D> csg_primitive;
+	Ref<csg_tool::CSGBoxShape3D> csg_primitive;
 
 protected:
 	static void _bind_methods();
@@ -218,11 +218,11 @@ public:
 class CSGCylinder3D : public CSGPrimitive3D {
 	GDCLASS(CSGCylinder3D, CSGPrimitive3D);
 
-	virtual Ref<CSGPrimitiveShape3D> get_csg_primitive() const override {
+	virtual Ref<csg_tool::CSGPrimitiveShape3D> get_csg_primitive() const override {
 		return csg_primitive;
 	}
 
-	Ref<CSGCylinderShape3D> csg_primitive;
+	Ref<csg_tool::CSGCylinderShape3D> csg_primitive;
 
 protected:
 	static void _bind_methods();
@@ -246,11 +246,11 @@ public:
 class CSGTorus3D : public CSGPrimitive3D {
 	GDCLASS(CSGTorus3D, CSGPrimitive3D);
 
-	virtual Ref<CSGPrimitiveShape3D> get_csg_primitive() const override {
+	virtual Ref<csg_tool::CSGPrimitiveShape3D> get_csg_primitive() const override {
 		return csg_primitive;
 	}
 
-	Ref<CSGTorusShape3D> csg_primitive;
+	Ref<csg_tool::CSGTorusShape3D> csg_primitive;
 
 protected:
 	static void _bind_methods();
@@ -277,24 +277,24 @@ class CSGPolygon3D : public CSGPrimitive3D {
 public:
 	// This is very ugly
 	enum Mode {
-		MODE_DEPTH = CSGPolygonShape3D::MODE_DEPTH,
-		MODE_SPIN = CSGPolygonShape3D::MODE_SPIN,
-		MODE_PATH = CSGPolygonShape3D::MODE_PATH
+		MODE_DEPTH = csg_tool::CSGPolygonShape3D::MODE_DEPTH,
+		MODE_SPIN = csg_tool::CSGPolygonShape3D::MODE_SPIN,
+		MODE_PATH = csg_tool::CSGPolygonShape3D::MODE_PATH
 	};
 
 	// and this too
 	enum PathRotation {
-		PATH_ROTATION_POLYGON = CSGPolygonShape3D::PATH_ROTATION_POLYGON,
-		PATH_ROTATION_PATH = CSGPolygonShape3D::PATH_ROTATION_PATH,
-		PATH_ROTATION_PATH_FOLLOW = CSGPolygonShape3D::PATH_ROTATION_PATH_FOLLOW,
+		PATH_ROTATION_POLYGON = csg_tool::CSGPolygonShape3D::PATH_ROTATION_POLYGON,
+		PATH_ROTATION_PATH = csg_tool::CSGPolygonShape3D::PATH_ROTATION_PATH,
+		PATH_ROTATION_PATH_FOLLOW = csg_tool::CSGPolygonShape3D::PATH_ROTATION_PATH_FOLLOW,
 	};
 
 private:
-	virtual Ref<CSGPrimitiveShape3D> get_csg_primitive() const override {
+	virtual Ref<csg_tool::CSGPrimitiveShape3D> get_csg_primitive() const override {
 		return csg_primitive;
 	}
 
-	Ref<CSGPolygonShape3D> csg_primitive;
+	Ref<csg_tool::CSGPolygonShape3D> csg_primitive;
 
 	virtual CSGBrush _build_brush() override;
 

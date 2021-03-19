@@ -147,7 +147,7 @@ CSGBrush CSGShape3D::_get_brush() {
 		csg_tool.instance();
 
 		CSGBrush self_brush = _build_brush();
-		csg_tool->add_brush(self_brush, static_cast<CSGTool::Operation>(operation), snap);
+		csg_tool->add_brush(self_brush, static_cast<csg_tool::CSGTool::Operation>(operation), snap);
 
 		for (int i = 0; i < get_child_count(); i++) {
 			CSGShape3D *child = Object::cast_to<CSGShape3D>(get_child(i));
@@ -161,7 +161,7 @@ CSGBrush CSGShape3D::_get_brush() {
 			CSGBrush child_brush = child->_get_brush();
 			CSGBrush n;
 			n.copy_from(child_brush, child->get_transform());
-			csg_tool->add_brush(n, static_cast<CSGTool::Operation>(child->get_operation()), snap);
+			csg_tool->add_brush(n, static_cast<csg_tool::CSGTool::Operation>(child->get_operation()), snap);
 		}
 		node_aabb = csg_tool->get_aabb();
 		dirty = false;
@@ -376,40 +376,40 @@ void CSGPrimitive3D::_bind_methods() {
 }
 
 void CSGPrimitive3D::set_invert_faces(bool p_invert) {
-	Ref<CSGPrimitiveShape3D> csg_primitive = get_csg_primitive();
+	Ref<csg_tool::CSGPrimitiveShape3D> csg_primitive = get_csg_primitive();
 	csg_primitive->set_invert_faces(p_invert);
 	_make_dirty();
 }
 
 bool CSGPrimitive3D::is_inverting_faces() const {
-	const Ref<CSGPrimitiveShape3D> csg_primitive = get_csg_primitive();
+	const Ref<csg_tool::CSGPrimitiveShape3D> csg_primitive = get_csg_primitive();
 	return csg_primitive->is_inverting_faces();
 }
 
 void CSGPrimitive3D::set_smooth_faces(bool p_smooth_faces) {
-	Ref<CSGPrimitiveShape3D> csg_primitive = get_csg_primitive();
+	Ref<csg_tool::CSGPrimitiveShape3D> csg_primitive = get_csg_primitive();
 	csg_primitive->set_smooth_faces(p_smooth_faces);
 	_make_dirty();
 }
 
 bool CSGPrimitive3D::get_smooth_faces() const {
-	const Ref<CSGPrimitiveShape3D> csg_primitive = get_csg_primitive();
+	const Ref<csg_tool::CSGPrimitiveShape3D> csg_primitive = get_csg_primitive();
 	return csg_primitive->get_smooth_faces();
 }
 
 void CSGPrimitive3D::set_material(const Ref<Material> &p_material) {
-	Ref<CSGPrimitiveShape3D> csg_primitive = get_csg_primitive();
+	Ref<csg_tool::CSGPrimitiveShape3D> csg_primitive = get_csg_primitive();
 	csg_primitive->set_material(p_material);
 	_make_dirty();
 }
 
 Ref<Material> CSGPrimitive3D::get_material() const {
-	const Ref<CSGPrimitiveShape3D> csg_primitive = get_csg_primitive();
+	const Ref<csg_tool::CSGPrimitiveShape3D> csg_primitive = get_csg_primitive();
 	return csg_primitive->get_material();
 }
 
 CSGBrush CSGPrimitive3D::_build_brush() {
-	Ref<CSGPrimitiveShape3D> csg_primitive = get_csg_primitive();
+	Ref<csg_tool::CSGPrimitiveShape3D> csg_primitive = get_csg_primitive();
 	if (csg_primitive.is_null()) {
 		return CSGBrush();
 	} else {
@@ -666,7 +666,7 @@ CSGTorus3D::CSGTorus3D() {
 CSGBrush CSGPolygon3D::_build_brush() {
 	// set our bounding box
 
-	if (csg_primitive->get_mode() == CSGPolygonShape3D::MODE_PATH) {
+	if (csg_primitive->get_mode() == csg_tool::CSGPolygonShape3D::MODE_PATH) {
 		if (!has_node(path_node)) {
 			return CSGBrush();
 		}
@@ -722,14 +722,14 @@ void CSGPolygon3D::_notification(int p_what) {
 }
 
 void CSGPolygon3D::_validate_property(PropertyInfo &property) const {
-	CSGPolygonShape3D::Mode mode = csg_primitive->get_mode();
-	if (property.name.begins_with("spin") && mode != CSGPolygonShape3D::MODE_SPIN) {
+	csg_tool::CSGPolygonShape3D::Mode mode = csg_primitive->get_mode();
+	if (property.name.begins_with("spin") && mode != csg_tool::CSGPolygonShape3D::MODE_SPIN) {
 		property.usage = 0;
 	}
-	if (property.name.begins_with("path") && mode != CSGPolygonShape3D::MODE_PATH) {
+	if (property.name.begins_with("path") && mode != csg_tool::CSGPolygonShape3D::MODE_PATH) {
 		property.usage = 0;
 	}
-	if (property.name == "depth" && mode != CSGPolygonShape3D::MODE_DEPTH) {
+	if (property.name == "depth" && mode != csg_tool::CSGPolygonShape3D::MODE_DEPTH) {
 		property.usage = 0;
 	}
 
@@ -814,7 +814,7 @@ Vector<Vector2> CSGPolygon3D::get_polygon() const {
 }
 
 void CSGPolygon3D::set_mode(Mode p_mode) {
-	csg_primitive->set_mode(static_cast<CSGPolygonShape3D::Mode>(p_mode));
+	csg_primitive->set_mode(static_cast<csg_tool::CSGPolygonShape3D::Mode>(p_mode));
 	_make_dirty();
 	update_gizmo();
 	notify_property_list_changed();
@@ -884,7 +884,7 @@ float CSGPolygon3D::get_path_interval() const {
 }
 
 void CSGPolygon3D::set_path_rotation(CSGPolygon3D::PathRotation p_rotation) {
-	csg_primitive->set_path_rotation(static_cast<CSGPolygonShape3D::PathRotation>(p_rotation));
+	csg_primitive->set_path_rotation(static_cast<csg_tool::CSGPolygonShape3D::PathRotation>(p_rotation));
 	_make_dirty();
 	update_gizmo();
 }
