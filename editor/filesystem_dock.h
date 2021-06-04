@@ -59,14 +59,14 @@ class FileSystemDock : public VBoxContainer {
 	GDCLASS(FileSystemDock, VBoxContainer);
 
 public:
-	enum FileListDisplayMode {
-		FILE_LIST_DISPLAY_THUMBNAILS,
-		FILE_LIST_DISPLAY_LIST
-	};
-
 	enum DisplayMode {
 		DISPLAY_MODE_TREE_ONLY,
 		DISPLAY_MODE_SPLIT,
+	};
+
+	enum FileListDisplayMode {
+		FILE_LIST_DISPLAY_THUMBNAILS,
+		FILE_LIST_DISPLAY_LIST
 	};
 
 	enum FileSortOption {
@@ -299,41 +299,52 @@ private:
 
 	void _update_display_mode(bool p_force = false);
 
-	Vector<String> _tree_get_selected(bool remove_self_inclusion = true);
+	Vector<String> _tree_get_selected(bool p_remove_self_inclusion = true) const;
 
 	bool _is_file_type_disabled_by_feature_profile(const StringName &p_class);
 
 	void _feature_profile_changed();
-	Vector<String> _remove_self_included_paths(Vector<String> selected_strings);
+	Vector<String> _remove_self_included_paths(Vector<String> selected_strings) const ;
 
 protected:
 	void _notification(int p_what);
 	static void _bind_methods();
 
 public:
-	String get_selected_path() const;
+	void set_file_sort(FileSortOption p_file_sort);
+	FileSortOption get_file_sort() { return file_sort; }
 
-	String get_current_path() const;
-	void navigate_to_path(const String &p_path);
+	int get_split_offset() { return split_box->get_split_offset(); }
+	void set_split_offset(int p_offset) { split_box->set_split_offset(p_offset); }
+
+	String get_current_folder() const;
+
 	void focus_on_filter();
 
 	void fix_dependencies(const String &p_for_file);
 
-	int get_split_offset() { return split_box->get_split_offset(); }
-	void set_split_offset(int p_offset) { split_box->set_split_offset(p_offset); }
 	void select_file(const String &p_file);
 
+	// Exposed methods
 	void set_display_mode(DisplayMode p_display_mode);
 	DisplayMode get_display_mode() { return display_mode; }
 
-	void set_file_sort(FileSortOption p_file_sort);
-	FileSortOption get_file_sort() { return file_sort; }
-
 	void set_file_list_display_mode(FileListDisplayMode p_mode);
-	FileListDisplayMode get_file_list_display_mode() { return file_list_display_mode; };
+	FileListDisplayMode get_file_list_display_mode() { return file_list_display_mode; }
+
+	Tree *get_filesystem_tree() const;
+	ItemList *get_filesystem_list() const;
+
+	Vector<String> get_selected_paths() const;
+	String get_current_path() const;
+
+	void navigate_to_path(const String &p_path);
 
 	FileSystemDock(EditorNode *p_editor);
-	~FileSystemDock();
+	~FileSystemDock() {}
 };
+
+VARIANT_ENUM_CAST(FileSystemDock::DisplayMode);
+VARIANT_ENUM_CAST(FileSystemDock::FileListDisplayMode);
 
 #endif // SCENES_DOCK_H

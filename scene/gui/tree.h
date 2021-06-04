@@ -627,7 +627,7 @@ public:
 
 	void set_hide_root(bool p_enabled);
 	bool is_root_hidden() const;
-	TreeItem *get_next_selected(TreeItem *p_item);
+	TreeItem *get_next_selected(TreeItem *p_item) const;
 	TreeItem *get_selected() const;
 	int get_selected_column() const;
 	int get_pressed_button() const;

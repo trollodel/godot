@@ -451,7 +451,7 @@ void FileSystemDock::_notification(int p_what) {
 void FileSystemDock::_tree_multi_selected(Object *p_item, int p_column, bool p_selected) {
 	// Update the import dock.
 	import_dock_needs_update = true;
-	call_deferred("_update_import_dock");
+	callable_mp(this, &FileSystemDock::_update_import_dock).call_deferred({}, 0);
 
 	// Return if we don't select something new.
 	if (!p_selected) {
@@ -483,12 +483,31 @@ void FileSystemDock::_tree_multi_selected(Object *p_item, int p_column, bool p_s
 	}
 }
 
-String FileSystemDock::get_selected_path() const {
+String FileSystemDock::get_current_folder() const {
 	if (path.ends_with("/")) {
 		return path;
 	} else {
 		return path.get_base_dir();
 	}
+}
+
+Vector<String> FileSystemDock::get_selected_paths() const {
+	// List selected.
+	Vector<String> selected;
+	if (display_mode == DISPLAY_MODE_TREE_ONLY) {
+		// Use the tree
+		selected = _tree_get_selected();
+	} else {
+		// Use the file list.
+		for (int i = 0; i < files->get_item_count(); i++) {
+			if (!files->is_selected(i)) {
+				continue;
+			}
+
+			selected.push_back(files->get_item_metadata(i));
+		}
+	}
+	return selected;
 }
 
 String FileSystemDock::get_current_path() const {
@@ -1639,7 +1658,7 @@ void FileSystemDock::_move_operation_confirm(const String &p_to_path, bool p_ove
 	}
 }
 
-Vector<String> FileSystemDock::_tree_get_selected(bool remove_self_inclusion) {
+Vector<String> FileSystemDock::_tree_get_selected(bool p_remove_self_inclusion) const {
 	// Build a list of selected items with the active one at the first position.
 	Vector<String> selected_strings;
 
@@ -1651,20 +1670,19 @@ Vector<String> FileSystemDock::_tree_get_selected(bool remove_self_inclusion) {
 
 	TreeItem *selected = tree->get_root();
 	selected = tree->get_next_selected(selected);
-	while (selected) {
+	for (; selected; selected = tree->get_next_selected(selected)) {
 		if (selected != active_selected && selected != favorites_item) {
 			selected_strings.push_back(selected->get_metadata(0));
 		}
-		selected = tree->get_next_selected(selected);
 	}
 
-	if (remove_self_inclusion) {
+	if (p_remove_self_inclusion) {
 		selected_strings = _remove_self_included_paths(selected_strings);
 	}
 	return selected_strings;
 }
 
-Vector<String> FileSystemDock::_remove_self_included_paths(Vector<String> selected_strings) {
+Vector<String> FileSystemDock::_remove_self_included_paths(Vector<String> selected_strings) const {
 	// Remove paths or files that are included into another.
 	if (selected_strings.size() > 1) {
 		selected_strings.sort_custom<NaturalNoCaseComparator>();
@@ -2575,7 +2593,7 @@ void FileSystemDock::_file_multi_selected(int p_index, bool p_selected) {
 
 	// Update the import dock.
 	import_dock_needs_update = true;
-	call_deferred("_update_import_dock");
+	callable_mp(this, &FileSystemDock::_update_import_dock).call_deferred({}, 0);
 }
 
 void FileSystemDock::_tree_gui_input(Ref<InputEvent> p_event) {
@@ -2646,22 +2664,7 @@ void FileSystemDock::_update_import_dock() {
 		return;
 	}
 
-	// List selected.
-	Vector<String> selected;
-	if (display_mode == DISPLAY_MODE_TREE_ONLY) {
-		// Use the tree
-		selected = _tree_get_selected();
-
-	} else {
-		// Use the file list.
-		for (int i = 0; i < files->get_item_count(); i++) {
-			if (!files->is_selected(i)) {
-				continue;
-			}
-
-			selected.push_back(files->get_item_metadata(i));
-		}
-	}
+	Vector<String> selected = get_selected_paths();
 
 	// Expand directory selection
 	Vector<String> efiles;
@@ -2745,18 +2748,34 @@ MenuButton *FileSystemDock::_create_file_menu_button() {
 }
 
 void FileSystemDock::_bind_methods() {
-	ClassDB::bind_method(D_METHOD("_update_tree"), &FileSystemDock::_update_tree);
-
 	ClassDB::bind_method(D_METHOD("_file_list_thumbnail_done"), &FileSystemDock::_file_list_thumbnail_done);
 	ClassDB::bind_method(D_METHOD("_tree_thumbnail_done"), &FileSystemDock::_tree_thumbnail_done);
-	ClassDB::bind_method(D_METHOD("_select_file"), &FileSystemDock::_select_file);
 
 	ClassDB::bind_method(D_METHOD("get_drag_data_fw", "position", "from"), &FileSystemDock::get_drag_data_fw);
 	ClassDB::bind_method(D_METHOD("can_drop_data_fw", "position", "data", "from"), &FileSystemDock::can_drop_data_fw);
 	ClassDB::bind_method(D_METHOD("drop_data_fw", "position", "data", "from"), &FileSystemDock::drop_data_fw);
+
+	ClassDB::bind_method(D_METHOD("set_display_mode", "display_mode"), &FileSystemDock::set_display_mode);
+	ClassDB::bind_method(D_METHOD("get_display_mode"), &FileSystemDock::get_display_mode);
+	ClassDB::bind_method(D_METHOD("set_file_list_display_mode", "file_list_display_mode"), &FileSystemDock::set_file_list_display_mode);
+	ClassDB::bind_method(D_METHOD("get_file_list_display_mode"), &FileSystemDock::get_file_list_display_mode);
+
+	ClassDB::bind_method(D_METHOD("get_filesystem_tree"), &FileSystemDock::get_filesystem_tree);
+	ClassDB::bind_method(D_METHOD("get_filesystem_list"), &FileSystemDock::get_filesystem_list);
+
+	ClassDB::bind_method(D_METHOD("get_current_path"), &FileSystemDock::get_current_path);
+	ClassDB::bind_method(D_METHOD("get_selected_paths"), &FileSystemDock::get_selected_paths);
+
 	ClassDB::bind_method(D_METHOD("navigate_to_path", "path"), &FileSystemDock::navigate_to_path);
 
-	ClassDB::bind_method(D_METHOD("_update_import_dock"), &FileSystemDock::_update_import_dock);
+	ADD_PROPERTY(PropertyInfo(Variant::INT, "display_mode", PROPERTY_HINT_ENUM, "Tree Only,Split"), "set_display_mode", "get_display_mode");
+	ADD_PROPERTY(PropertyInfo(Variant::INT, "file_list_display_mode", PROPERTY_HINT_ENUM, "Thumbnails,List"), "set_file_list_display_mode", "get_file_list_display_mode");
+
+	BIND_ENUM_CONSTANT(DisplayMode::DISPLAY_MODE_TREE_ONLY);
+	BIND_ENUM_CONSTANT(DisplayMode::DISPLAY_MODE_SPLIT);
+
+	BIND_ENUM_CONSTANT(FileListDisplayMode::FILE_LIST_DISPLAY_THUMBNAILS);
+	BIND_ENUM_CONSTANT(FileListDisplayMode::FILE_LIST_DISPLAY_LIST);
 
 	ADD_SIGNAL(MethodInfo("inherit", PropertyInfo(Variant::STRING, "file")));
 	ADD_SIGNAL(MethodInfo("instance", PropertyInfo(Variant::PACKED_STRING_ARRAY, "files")));
@@ -2766,7 +2785,16 @@ void FileSystemDock::_bind_methods() {
 	ADD_SIGNAL(MethodInfo("files_moved", PropertyInfo(Variant::STRING, "old_file"), PropertyInfo(Variant::STRING, "new_file")));
 	ADD_SIGNAL(MethodInfo("folder_moved", PropertyInfo(Variant::STRING, "old_folder"), PropertyInfo(Variant::STRING, "new_file")));
 
+	ADD_SIGNAL(MethodInfo("selected_paths_changed"));
 	ADD_SIGNAL(MethodInfo("display_mode_changed"));
+}
+
+Tree *FileSystemDock::get_filesystem_tree() const {
+	return tree;
+}
+
+ItemList *FileSystemDock::get_filesystem_list() const {
+	return files;
 }
 
 FileSystemDock::FileSystemDock(EditorNode *p_editor) {
@@ -3012,7 +3040,4 @@ FileSystemDock::FileSystemDock(EditorNode *p_editor) {
 	file_list_display_mode = FILE_LIST_DISPLAY_THUMBNAILS;
 
 	always_show_folders = false;
-}
-
-FileSystemDock::~FileSystemDock() {
 }

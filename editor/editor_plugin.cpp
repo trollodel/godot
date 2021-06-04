@@ -231,7 +231,7 @@ void EditorInterface::select_file(const String &p_file) {
 }
 
 String EditorInterface::get_selected_path() const {
-	return EditorNode::get_singleton()->get_filesystem_dock()->get_selected_path();
+	return EditorNode::get_singleton()->get_filesystem_dock()->get_current_folder();
 }
 
 String EditorInterface::get_current_path() const {

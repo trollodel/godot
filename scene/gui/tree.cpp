@@ -3688,7 +3688,7 @@ int Tree::get_edited_column() const {
 	return edited_col;
 }
 
-TreeItem *Tree::get_next_selected(TreeItem *p_item) {
+TreeItem *Tree::get_next_selected(TreeItem *p_item) const {
 	/*
 	if (!p_item)
 		return nullptr;
